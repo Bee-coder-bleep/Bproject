@@ -1,11 +1,773 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bonfire Adventures</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <style>
+        /* ── reset ── */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#fff; color:#1a1a2e; overflow-x:hidden; }
+        a { text-decoration:none; color:inherit; }
+        ul { list-style:none; }
+        img { max-width:100%; display:block; }
+        .container { max-width:1200px; margin:0 auto; padding:0 20px; }
+
+        /* ── top bar ── */
+        .topbar {
+            background:#0a0a1a; color:#fff; padding:8px 0;
+            font-size:13px; display:block;
+        }
+        .topbar .container {
+            display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+        }
+        .topbar .social a { color:#fff; opacity:0.7; margin-right:12px; transition:opacity .3s; }
+        .topbar .social a:hover { opacity:1; }
+        .topbar .info { display:flex; flex-wrap:wrap; gap:16px; align-items:center; }
+        .topbar .info span { display:flex; align-items:center; gap:6px; opacity:0.8; font-size:12px; }
+        .topbar .info i { font-size:11px; }
+        .topbar .contact-btn {
+            background:#E8420A; color:#fff; padding:6px 18px; border-radius:50px;
+            font-weight:600; font-size:12px; transition:background .3s; border:none; cursor:pointer;
+        }
+        .topbar .contact-btn:hover { background:#c93809; }
+
+        /* ── header ── */
+        .header {
+            background:linear-gradient(rgba(10,30,15,0.55),rgba(10,30,15,0.55));
+            padding:16px 0;
+            position:relative; z-index:1000;
+        }
+        .header .container {
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .header .logo {
+            display:flex; align-items:center; gap:10px;
+        }
+        .header .logo img { height: 100px; }
+
+        .header .nav { display:flex; align-items:center; gap:28px; }
+        .header .nav > li { position:relative; padding:6px 0; cursor:pointer; }
+        .header .nav > li > a {
+            font-weight:600; font-size:15px; color:#fff;
+            display:flex; align-items:center; gap:6px;
+        }
+        .header .nav > li > a i { font-size:13px; }
+
+        /* popups */
+        .popup {
+            position:absolute; top:100%; left:50%; transform:translateX(-50%) translateY(10px);
+            background:#fff; min-width:280px; padding:24px;
+            box-shadow:0 20px 60px rgba(0,0,0,0.18); border-radius:16px;
+            opacity:0; visibility:hidden; transition:all 0.25s ease; z-index:200;
+        }
+        .header .nav > li:hover .popup {
+            opacity:1; visibility:visible; transform:translateX(-50%) translateY(0);
+        }
+
+        .popup .cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:20px; }
+        .popup .cols h4 { font-size:12px; font-weight:700; color:#E8420A; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+        .popup .cols li { margin-bottom:6px; }
+        .popup .cols li a { font-size:13px; color:#333; transition:color .3s; display:flex; align-items:center; gap:6px; }
+        .popup .cols li a:hover { color:#E8420A; }
+        .popup .cols li a i { font-size:10px; color:#E8420A; }
+
+        .popup .tabs { display:flex; gap:12px; border-bottom:2px solid #eee; padding-bottom:12px; margin-bottom:16px; }
+        .popup .tabs button {
+            background:none; border:none; font-weight:600; font-size:14px; color:#888;
+            padding:4px 12px; cursor:pointer; transition:color .3s; border-radius:20px;
+        }
+        .popup .tabs button.active { color:#E8420A; background:#fef0eb; }
+        .popup .tab-content { display:none; }
+        .popup .tab-content.active { display:block; }
+
+        .popup .explore-all {
+            display:inline-block; margin-top:10px; font-weight:600; font-size:13px; color:#E8420A;
+        }
+        .popup .explore-all i { margin-left:4px; }
+
+        .mobile-toggle { display:none; background:none; border:none; font-size:24px; cursor:pointer; color:#fff; }
+
+        .contact-pill {
+            background:#E8420A; color:#fff; padding:10px 14px 10px 22px; border-radius:50px;
+            font-weight:700; font-size:14px; display:inline-flex; align-items:center; gap:10px;
+            transition:background .3s;
+        }
+        .contact-pill:hover { background:#c93809; }
+        .contact-pill .circle {
+            width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,0.25);
+            display:flex; align-items:center; justify-content:center; font-size:12px;
+        }
+
+        /* ── hero ── */
+        .hero {
+            position:relative; min-height:80vh; display:flex; align-items:center; justify-content:center;
+            background:#0a0a1a url('https://images.unsplash.com/photo-1517824806704-9040b037703b?w=1600&auto=format&fit=crop&q=75') center/cover no-repeat;
+            overflow:hidden;
+        }
+        .hero video {
+            position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+        }
+        .hero .overlay {
+            position:relative; z-index:2; text-align:center; padding:20px; width:100%;
+            background:rgba(0,0,0,0.35); backdrop-filter:blur(4px); padding:40px 20px;
+        }
+        .hero .overlay h1 {
+            font-size:38px; font-weight:800; color:#fff; letter-spacing:1px;
+        }
+        .hero .overlay h1 small { display:block; font-size:16px; font-weight:400; opacity:0.7; margin-top:4px; }
+        .hero .overlay .price { font-size:48px; font-weight:800; color:#fff; margin:8px 0; }
+        .hero .overlay .price small { font-size:18px; font-weight:400; opacity:0.7; display:block; }
+        .hero .overlay .ksh { font-size:20px; font-weight:700; color:#E8420A; }
+
+        .search-bar {
+            background:#fff; border-radius:60px; padding:6px; max-width:720px;
+            margin:24px auto 0; display:flex; align-items:center; box-shadow:0 12px 40px rgba(0,0,0,0.3);
+            flex-wrap:wrap;
+        }
+        .search-bar .field {
+            flex:1; padding:10px 16px; display:flex; align-items:center; gap:10px;
+            border-right:1px solid #eee; min-width:140px;
+        }
+        .search-bar .field:last-child { border-right:none; }
+        .search-bar .field i { color:#E8420A; }
+        .search-bar .field input, .search-bar .field select {
+            border:none; outline:none; font-size:13px; font-family:inherit; width:100%; background:transparent;
+        }
+        .search-bar .field label { font-size:10px; font-weight:600; color:#888; text-transform:uppercase; display:block; }
+        .search-bar .search-btn {
+            background:#E8420A; color:#fff; border:none; padding:12px 32px; border-radius:50px;
+            font-weight:700; font-size:13px; cursor:pointer; transition:background .3s;
+        }
+        .search-bar .search-btn:hover { background:#c93809; }
+
+        /* ── sections ── */
+        .section { padding:70px 0; }
+        .section-dark { background:#f8f9fa; }
+
+        .section-title { text-align:center; margin-bottom:40px; }
+        .section-title .sub { color:#E8420A; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:1.5px; }
+        .section-title h2 { font-size:34px; font-weight:800; color:#1a1a2e; }
+        .section-title p { color:#666; max-width:560px; margin:10px auto 0; line-height:1.6; }
+
+        .section-header {
+            display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; margin-bottom:32px;
+        }
+        .section-header .left .sub { color:#E8420A; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:1px; }
+        .section-header .left h2 { font-size:30px; font-weight:800; color:#1a1a2e; }
+        .section-header .right a { color:#E8420A; font-weight:600; display:flex; align-items:center; gap:6px; }
+
+        /* ── cards ── */
+        .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:24px; }
+        .card {
+            background:#fff; border-radius:16px; overflow:hidden;
+            box-shadow:0 4px 20px rgba(0,0,0,0.06); transition:transform .3s,box-shadow .3s;
+        }
+        .card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,0.1); }
+        .card .img { height:170px; background:#e9ecef; position:relative; overflow:hidden; }
+        .card .img img { width:100%; height:100%; object-fit:cover; }
+        .card .img .badge { position:absolute; top:12px; left:12px; background:#E8420A; color:#fff; font-size:10px; font-weight:700; padding:2px 14px; border-radius:50px; }
+        .card .body { padding:18px; }
+        .card .body h3 { font-size:17px; font-weight:700; margin-bottom:4px; }
+        .card .body .meta { display:flex; align-items:center; gap:12px; color:#666; font-size:13px; margin:6px 0; }
+        .card .body .meta i { color:#E8420A; }
+        .card .body .btn-link { color:#E8420A; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:4px; }
+
+        /* ── stats ── */
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; margin-top:24px; }
+        .stat-item { background:#fff; padding:24px 16px; border-radius:16px; text-align:center; box-shadow:0 4px 16px rgba(0,0,0,0.04); border:1px solid #f0f0f0; }
+        .stat-item .num { font-size:32px; font-weight:800; color:#E8420A; }
+        .stat-item .num span { font-size:22px; }
+        .stat-item .label { font-size:13px; color:#666; margin-top:2px; font-weight:500; }
+
+        /* ── testimonials ── */
+        .test-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; }
+        .test-card { background:#fff; padding:24px; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.04); border:1px solid #f0f0f0; }
+        .test-card .quote { color:#E8420A; font-size:24px; opacity:0.3; margin-bottom:6px; }
+        .test-card p { color:#333; line-height:1.6; font-size:14px; margin-bottom:12px; }
+        .test-card .author { display:flex; align-items:center; gap:12px; }
+        .test-card .author .avatar { width:40px; height:40px; border-radius:50%; background:#e9ecef; display:flex; align-items:center; justify-content:center; font-weight:700; color:#666; }
+        .test-card .author .info .name { font-weight:700; font-size:14px; }
+        .test-card .author .info .role { font-size:12px; color:#888; }
+        .test-card .stars { color:#f5a623; font-size:13px; margin-bottom:6px; }
+
+        /* ── carousel ── */
+        .carousel-wrap { position:relative; overflow:hidden; }
+        .carousel-track { display:flex; gap:20px; transition:transform 0.4s ease; }
+        .carousel-track .card { min-width:calc(33.33% - 14px); flex-shrink:0; }
+        .carousel-btn {
+            position:absolute; top:50%; transform:translateY(-50%);
+            background:#fff; border:none; width:40px; height:40px; border-radius:50%;
+            box-shadow:0 4px 16px rgba(0,0,0,0.12); cursor:pointer; font-size:18px;
+            z-index:5; transition:background .3s;
+        }
+        .carousel-btn:hover { background:#f0f0f0; }
+        .carousel-btn.prev { left:-14px; }
+        .carousel-btn.next { right:-14px; }
+
+        /* ── destinations grid ── */
+        .dest-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:20px; }
+        .dest-card { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.04); text-align:center; padding:16px; }
+        .dest-card .dest-img { height:130px; background:#e9ecef; border-radius:12px; overflow:hidden; margin-bottom:10px; }
+        .dest-card .dest-img img { width:100%; height:100%; object-fit:cover; }
+        .dest-card h4 { font-size:16px; font-weight:700; }
+        .dest-card p { font-size:13px; color:#666; line-height:1.5; }
+
+        /* ── cta ── */
+        .cta-section {
+            background:linear-gradient(135deg,#0a0a1a,#1a1a3e); padding:70px 0; text-align:center; color:#fff;
+        }
+        .cta-section h2 { font-size:34px; font-weight:800; }
+        .cta-section p { opacity:0.7; max-width:480px; margin:10px auto 28px; line-height:1.6; }
+        .cta-section .btn-group { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+        .cta-section .btn-primary {
+            background:#E8420A; color:#fff; padding:14px 34px; border-radius:50px; font-weight:600;
+            border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; transition:background .3s;
+        }
+        .cta-section .btn-primary:hover { background:#c93809; }
+        .cta-section .btn-secondary {
+            background:transparent; color:#fff; padding:14px 34px; border-radius:50px; font-weight:600;
+            border:2px solid rgba(255,255,255,0.2); cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+            transition:border-color .3s,background .3s;
+        }
+        .cta-section .btn-secondary:hover { border-color:#fff; background:rgba(255,255,255,0.06); }
+
+        /* ── footer ── */
+        .footer { background:#0a0a1a; color:rgba(255,255,255,0.7); padding:50px 0 24px; }
+        .footer .container { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:32px; }
+        .footer h4 { color:#fff; font-weight:700; margin-bottom:14px; font-size:15px; }
+        .footer ul li { margin-bottom:8px; }
+        .footer ul li a { font-size:13px; transition:color .3s; }
+        .footer ul li a:hover { color:#E8420A; }
+        .footer .logo img { height:40px; margin-bottom:10px; }
+        .footer .social { display:flex; gap:10px; margin-top:10px; }
+        .footer .social a { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; transition:background .3s; color:#fff; }
+        .footer .social a:hover { background:#E8420A; }
+        .footer .bottom { border-top:1px solid rgba(255,255,255,0.06); padding-top:20px; margin-top:32px; text-align:center; font-size:13px; grid-column:1/-1; }
+
+        /* ── whatsapp float ── */
+        .whatsapp-float {
+            position:fixed; bottom:24px; right:24px; z-index:999;
+            background:#25D366; color:#fff; padding:14px 22px; border-radius:50px;
+            display:flex; align-items:center; gap:10px; font-weight:600; font-size:14px;
+            box-shadow:0 6px 30px rgba(37,211,102,0.4); transition:transform .3s; border:none; cursor:pointer;
+        }
+        .whatsapp-float:hover { transform:scale(1.04); }
+        .whatsapp-float i { font-size:22px; }
+
+        /* ── responsive ── */
+        @media(max-width:992px){
+            .topbar { display:block; }
+            .header .nav { display:none; flex-direction:column; position:absolute; top:100%; left:0; right:0; background:#0a1e0f; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,0.12); gap:12px; }
+            .header .nav.active { display:flex; }
+            .header .nav > li { width:100%; }
+            .popup { position:static; transform:none; box-shadow:none; padding:12px 0 0 20px; opacity:1; visibility:visible; display:none; width:100%; }
+            .header .nav > li:hover .popup, .header .nav > li.popup-open .popup { display:block; transform:none; }
+            .popup .cols { grid-template-columns:1fr 1fr; }
+            .mobile-toggle { display:block; }
+            .hero .overlay h1 { font-size:28px; }
+            .hero .overlay .price { font-size:34px; }
+            .search-bar { flex-direction:column; border-radius:20px; padding:16px; gap:8px; }
+            .search-bar .field { border-right:none; border-bottom:1px solid #eee; width:100%; }
+            .search-bar .field:last-child { border-bottom:none; }
+            .search-bar .search-btn { width:100%; justify-content:center; }
+            .carousel-track .card { min-width:calc(50% - 10px); }
+            .section-title h2 { font-size:28px; }
+            .section-header .left h2 { font-size:26px; }
+        }
+        @media(max-width:600px){
+            .topbar .info { gap:8px; }
+            .topbar .info span { font-size:11px; }
+            .hero .overlay h1 { font-size:22px; }
+            .hero .overlay .price { font-size:28px; }
+            .card-grid { grid-template-columns:1fr; }
+            .test-grid { grid-template-columns:1fr; }
+            .dest-grid { grid-template-columns:1fr 1fr; }
+            .stats-grid { grid-template-columns:1fr 1fr; }
+            .section { padding:50px 0; }
+            .carousel-track .card { min-width:calc(100% - 0px); }
+            .popup .cols { grid-template-columns:1fr; }
+            .cta-section h2 { font-size:26px; }
+            .footer .container { grid-template-columns:1fr; }
+        }
+    </style>
 </head>
 <body>
-    <p>Welcome to my website!</p>
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+    <div class="container">
+        <div class="social">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-x-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+        <div class="info">
+            <span><i class="fas fa-phone-alt"></i> 0751041743</span>
+            <span><i class="fas fa-phone-alt"></i> 0750508096</span>
+            <span><i class="fas fa-envelope"></i> bonfiretoursadventure@gmail.com</span>
+            <span><i class="fas fa-map-marker-alt"></i> Yala Towers, 4th Floor, Junction of Koinange & Biashara St</span>
+            <a href="contact.html" class="contact-btn">Contact Us</a>
+        </div>
+    </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+    <div class="container">
+        <a href="index.html" class="logo">
+            <img src="https://bonfireadventures.com/wp-content/uploads/2026/02/Logo.webp" alt="Bonfire Adventures">
+        </a>
+        <button class="mobile-toggle" onclick="document.querySelector('.header .nav').classList.toggle('active')">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav">
+            <!-- DESTINATIONS POPUP -->
+            <li>
+                <a><i class="fas fa-plane-departure"></i> Destinations <i class="fas fa-chevron-down" style="font-size:10px;"></i></a>
+                <div class="popup" style="min-width:500px;">
+                    <div class="tabs">
+                        <button class="active" data-tab="tab-kenya">Kenya</button>
+                        <button data-tab="tab-africa">Africa</button>
+                        <button data-tab="tab-intl">International</button>
+                    </div>
+                    <div id="tab-kenya" class="tab-content active">
+                        <div class="cols">
+                            <div><h4>Beach Holidays</h4><ul><li><a><i class="fas fa-chevron-right"></i> North Coast</a></li><li><a><i class="fas fa-chevron-right"></i> Diani</a></li><li><a><i class="fas fa-chevron-right"></i> Watamu</a></li><li><a><i class="fas fa-chevron-right"></i> Malindi</a></li></ul></div>
+                            <div><h4>Safari</h4><ul><li><a><i class="fas fa-chevron-right"></i> Maasai Mara</a></li><li><a><i class="fas fa-chevron-right"></i> Tsavo</a></li><li><a><i class="fas fa-chevron-right"></i> Samburu</a></li><li><a><i class="fas fa-chevron-right"></i> Amboseli</a></li></ul></div>
+                            <div><h4>Stay Cations</h4><ul><li><a><i class="fas fa-chevron-right"></i> Nairobi</a></li><li><a><i class="fas fa-chevron-right"></i> Mount Kenya</a></li><li><a><i class="fas fa-chevron-right"></i> Naivasha</a></li><li><a><i class="fas fa-chevron-right"></i> Nakuru</a></li></ul></div>
+                        </div>
+                    </div>
+                    <div id="tab-africa" class="tab-content">
+                        <div class="cols"><div><h4>Africa</h4><ul><li><a><i class="fas fa-chevron-right"></i> Zanzibar</a></li><li><a><i class="fas fa-chevron-right"></i> South Africa</a></li><li><a><i class="fas fa-chevron-right"></i> Morocco</a></li><li><a><i class="fas fa-chevron-right"></i> Rwanda</a></li><li><a><i class="fas fa-chevron-right"></i> Mauritius</a></li><li><a><i class="fas fa-chevron-right"></i> Egypt</a></li></ul></div></div>
+                    </div>
+                    <div id="tab-intl" class="tab-content">
+                        <div class="cols"><div><h4>International</h4><ul><li><a><i class="fas fa-chevron-right"></i> Singapore</a></li><li><a><i class="fas fa-chevron-right"></i> Vietnam</a></li><li><a><i class="fas fa-chevron-right"></i> Dubai</a></li><li><a><i class="fas fa-chevron-right"></i> Turkey</a></li><li><a><i class="fas fa-chevron-right"></i> Malaysia</a></li><li><a><i class="fas fa-chevron-right"></i> Europe</a></li><li><a><i class="fas fa-chevron-right"></i> China-Canton Fair</a></li><li><a><i class="fas fa-chevron-right"></i> Thailand</a></li><li><a><i class="fas fa-chevron-right"></i> Bali</a></li><li><a><i class="fas fa-chevron-right"></i> Jordan</a></li></ul></div></div>
+                    </div>
+                </div>
+            </li>
+
+           <!-- TOURS & PACKAGES POPUP -->
+<li>
+    <a><i class="fas fa-shopping-bag"></i> Tours & Packages <i class="fas fa-chevron-down" style="font-size:10px;"></i></a>
+    <div class="popup" style="min-width:680px; left:50%; transform:translateX(-50%) translateY(10px);">
+        <div class="cols" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+            <div>
+                <h4>Coastal Escapes</h4>
+                <ul>
+                    <li><a><i class="fas fa-chevron-right"></i> Mombasa North Coast</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Diani / Ukunda</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Watamu/Malindi</a></li>
+                </ul>
+                <a href="packages.html#coastal-escapes" class="explore-all">Explore All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div>
+                <h4>Safari Tours</h4>
+                <ul>
+                    <li><a><i class="fas fa-chevron-right"></i> Maasai Mara</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Samburu</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Amboseli</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Tsavo</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Nakuru</a></li>
+                </ul>
+                <a href="packages.html#safari-tours" class="explore-all">Explore All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div>
+                <h4>International</h4>
+                <ul>
+                    <li><a><i class="fas fa-chevron-right"></i> South Africa</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Mauritius</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Dubai, UAE</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Bali, Indonesia</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Hongkong</a></li>
+                </ul>
+                <a href="packages.html#international" class="explore-all">Explore All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div>
+                <h4>Seasonal & Special Deals</h4>
+                <ul>
+                    <li><a><i class="fas fa-chevron-right"></i> Nairobi Marathon 2026</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Galentine & Easter 2026</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Kuala Lumpur Shopcation</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> SGR Mombasa</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Watamu/Malindi Deals</a></li>
+                    <li><a><i class="fas fa-chevron-right"></i> Diani SGR Deals</a></li>
+                </ul>
+                <a href="packages.html#seasonal" class="explore-all">Explore All <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</li>
+
+            <!-- ABOUT US POPUP -->
+            <li>
+                <a><i class="far fa-sun"></i> About Us <i class="fas fa-chevron-down" style="font-size:10px;"></i></a>
+                <div class="popup" style="min-width:200px;">
+                    <ul><li><a><i class="fas fa-chevron-right" style="font-size:10px; color:#E8420A;"></i> Our Story</a></li><li><a><i class="fas fa-chevron-right" style="font-size:10px; color:#E8420A;"></i> Why Bonfire</a></li><li><a><i class="fas fa-chevron-right" style="font-size:10px; color:#E8420A;"></i> Reviews/Testimonial</a></li></ul>
+                    <div style="margin-top:12px; padding-top:12px; border-top:1px solid #eee; font-size:13px; color:#888;">⭐ 8 (361 people)</div>
+                </div>
+            </li>
+
+            <li><a href="#" onclick="location.reload();"><i class="fas fa-clipboard-list"></i> Blog</a></li>
+            <li><a href="contact.html" class="contact-pill">Contact Us <span class="circle"><i class="fas fa-chevron-right"></i></span></a></li>
+        </ul>
+    </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <video autoplay loop muted playsinline poster="https://images.unsplash.com/photo-1517824806704-9040b037703b?w=1600&auto=format&fit=crop&q=75">
+        <source src="hero.mp4" type="video/mp4">
+    </video>
+    <div class="overlay">
+        <h1>WE TAKE YOU PLACES, YOU MAKE THE MEMORIES <small>Curated beach holidays, safaris & international travel since 2009</small></h1>
+        <div class="search-bar">
+            <div class="field"><i class="fas fa-search"></i><input id="destSearchInput" placeholder="Insert keyword..."></div>
+            <div class="field"><i class="fas fa-map-marker-alt"></i>
+                <select id="destSearchSelect">
+                    <optgroup label="Kenya – Beach Holidays">
+                        <option value="coastal-escapes">North Coast</option>
+                        <option value="coastal-escapes">Diani</option>
+                        <option value="coastal-escapes">Watamu</option>
+                        <option value="coastal-escapes">Malindi</option>
+                    </optgroup>
+                    <optgroup label="Kenya – Safari">
+                        <option value="safari-tours">Maasai Mara</option>
+                        <option value="safari-tours">Tsavo</option>
+                        <option value="safari-tours">Samburu</option>
+                        <option value="safari-tours">Amboseli</option>
+                        <option value="safari-tours">Nakuru</option>
+                    </optgroup>
+                    <optgroup label="Kenya – Stay Cations">
+                        <option value="seasonal">Nairobi</option>
+                        <option value="seasonal">Mount Kenya</option>
+                        <option value="seasonal">Naivasha</option>
+                    </optgroup>
+                    <optgroup label="Africa">
+                        <option value="international">Zanzibar</option>
+                        <option value="international">South Africa</option>
+                        <option value="international">Morocco</option>
+                        <option value="international">Rwanda</option>
+                        <option value="international">Mauritius</option>
+                        <option value="international">Egypt</option>
+                    </optgroup>
+                    <optgroup label="International">
+                        <option value="international">Dubai, UAE</option>
+                        <option value="international">Malaysia</option>
+                        <option value="international">China – Canton Fair</option>
+                        <option value="international">Bali, Indonesia</option>
+                        <option value="international">Vietnam</option>
+                        <option value="international">Turkey</option>
+                        <option value="international">Europe</option>
+                        <option value="international">Thailand</option>
+                        <option value="international">Jordan</option>
+                    </optgroup>
+                </select>
+            </div>
+            <button class="search-btn" onclick="goToDestination()">SEARCH</button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEASONAL OFFERS CAROUSEL -->
+<!-- ============================================================ -->
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-title">
+            <span class="sub">GALENTINE AND EASTER GETAWAYS</span>
+            <h2>SEASONAL OFFERS & SPECIAL PACKAGES</h2>
+            <p>Limited-time beach escapes and holiday packages crafted for friendship, family, and unforgettable moments. Explore curated seasonal deals across Kenya's coast and beyond.</p>
+        </div>
+        <div class="carousel-wrap" id="seasonalCarousel">
+            <button class="carousel-btn prev" onclick="moveCarousel('seasonalCarousel',-1)"><i class="fas fa-chevron-left"></i></button>
+            <div class="carousel-track" id="seasonalTrack">
+                <div class="card"><div class="img"><img src="https://bonfireadventures.com/wp-content/uploads/2026/03/Sarova-Pool.webp" alt="Sarova Whitesands"><span class="badge">Easter</span></div><div class="body"><h3>Sarova Whitesands</h3><div class="meta"><i class="far fa-clock"></i> 3 Days/2 Nights</div><a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" class="btn-link">More Info <i class="fas fa-chevron-right"></i></a></div></div>
+                <div class="card"><div class="img"><img src="https://bonfireadventures.com/wp-content/uploads/2026/03/Diani-Baobab-1.webp" alt="Diani Baobab"><span class="badge">Easter</span></div><div class="body"><h3>Diani Baobab</h3><div class="meta"><i class="far fa-clock"></i> 5 Days/4 Nights</div><a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" class="btn-link">More Info <i class="fas fa-chevron-right"></i></a></div></div>
+                <div class="card"><div class="img"><img src="https://bonfireadventures.com/wp-content/uploads/2026/03/Dubai-Marina-1-1.webp" alt="Abu Dhabi & Dubai"><span class="badge">Easter</span></div><div class="body"><h3>Abu Dhabi & Dubai Combo</h3><div class="meta"><i class="far fa-clock"></i> 7 Days/6 Nights</div><a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" class="btn-link">More Info <i class="fas fa-chevron-right"></i></a></div></div>
+                <div class="card"><div class="img"><img src="https://bonfireadventures.com/wp-content/uploads/2026/04/silver-palm-hotel.webp" alt="Silver Palm"><span class="badge">Easter</span></div><div class="body"><h3>Silver Palm</h3><div class="meta"><i class="far fa-clock"></i> 3 Days/2 Nights</div><a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" class="btn-link">More Info <i class="fas fa-chevron-right"></i></a></div></div>
+            </div>
+            <button class="carousel-btn next" onclick="moveCarousel('seasonalCarousel',1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div style="text-align:center; margin-top:24px;">
+            <a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" style="background:#E8420A; color:#fff; padding:12px 32px; border-radius:50px; font-weight:600; display:inline-block;">Chat</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FEATURED PUBLICATIONS -->
+<!-- ============================================================ -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <span class="sub">FEATURED PUBLICATIONS</span>
+            <h2>FEATURED PUBLICATIONS</h2>
+            <p>Explore Bonfire Adventures brochures featuring curated travel packages, destination highlights, and unforgettable experiences across Kenya and beyond.</p>
+        </div>
+        <div class="card-grid">
+            <div class="card"><div class="img"><img src="https://bonfireadventures.com/wp-content/uploads/2026/02/italy-educational-tour-DdAb6wgl.jpg" alt="March 2026"></div><div class="body"><h3>March 2026 Travel Deals</h3><p style="font-size:13px; color:#666; line-height:1.5;">Explore safari adventures, beach holidays, and international trips with the latest travel packages and offers.</p><div style="display:flex; gap:12px; margin-top:10px;"><a href="#" class="btn-link">Share <i class="fas fa-share-alt"></i></a><a href="#" class="btn-link">Read <i class="fas fa-chevron-right"></i></a></div></div></div>
+            <div class="card"><div class="img"><img src="https://bonfireadventures.com/wp-content/uploads/2026/04/Pride-Inn-Main.webp" alt="April 2026"></div><div class="body"><h3>April Travel Deals</h3><p style="font-size:13px; color:#666; line-height:1.5;">Discover Easter holiday offers across safaris, beaches, and international destinations with special seasonal packages.</p><div style="display:flex; gap:12px; margin-top:10px;"><a href="#" class="btn-link">Share <i class="fas fa-share-alt"></i></a><a href="#" class="btn-link">Read <i class="fas fa-chevron-right"></i></a></div></div></div>
+            <div class="card"><div class="img"><img src="https://bonfireadventures.com/wp-content/uploads/2026/04/Sands-of-Chale.webp" alt="August 2026"></div><div class="body"><h3>August Travel Deals</h3><p style="font-size:13px; color:#666; line-height:1.5;">Find school holiday getaways and travel packages, from local escapes to international trips for August.</p><div style="display:flex; gap:12px; margin-top:10px;"><a href="#" class="btn-link">Share <i class="fas fa-share-alt"></i></a><a href="#" class="btn-link">Read <i class="fas fa-chevron-right"></i></a></div></div></div>
+        </div>
+        <div style="text-align:center; margin-top:24px;">
+            <a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" style="background:#E8420A; color:#fff; padding:12px 32px; border-radius:50px; font-weight:600; display:inline-block;">Chat</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHY BONFIRE -->
+<!-- ============================================================ -->
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-title">
+            <span class="sub">OUR PROMISE</span>
+            <h2>WHY TRAVEL WITH BONFIRE</h2>
+            <p>For years, we've helped travelers plan seamless beach holidays, safari experiences, and international journeys with clarity and reliable support.</p>
+        </div>
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-item"><div class="num" data-count="18">0<span>+</span></div><div class="label">Years of Travel Experience</div></div>
+            <div class="stat-item"><div class="num" data-count="50">0<span>+</span></div><div class="label">Curated Safari & Beach Packages</div></div>
+            <div class="stat-item"><div class="num" data-count="500">0<span>K+</span></div><div class="label">Happy Travelers</div></div>
+            <div class="stat-item"><div class="num" data-count="100">0<span>%</span></div><div class="label">Transparency Pricing</div></div>
+            <div class="stat-item"><div class="num" data-count="24">0<span>/7</span></div><div class="label">Travel Support</div></div>
+            <div class="stat-item"><div class="num" data-count="60">0<span>+</span></div><div class="label">Hotel Partners</div></div>
+        </div>
+        <div style="text-align:center; margin-top:28px;">
+            <a href="contact.html" style="background:#E8420A; color:#fff; padding:12px 32px; border-radius:50px; font-weight:600; display:inline-block;">Contact Us</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TESTIMONIALS -->
+<!-- ============================================================ -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <span class="sub">REVIEWS & TESTIMONIALS</span>
+            <h2>WHAT OUR TRAVELLERS SAY</h2>
+            <p>From coastal escapes to international tours, our clients share their honest experiences — highlighting the planning, coordination, and support that define every Bonfire journey.</p>
+        </div>
+        <div class="test-grid">
+            <div class="test-card"><div class="quote"><i class="fas fa-quote-left"></i></div><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div><p>Flights, transfers, and tours were handled effortlessly. The Phi Phi Islands experience was unforgettable. International travel felt easy.</p><div class="author"><div class="avatar">DK</div><div class="info"><div class="name">David K</div><div class="role">Thailand Anniversary Tour</div></div></div></div>
+            <div class="test-card"><div class="quote"><i class="fas fa-quote-left"></i></div><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>Smooth booking process, well-organized activities, and constant WhatsApp support. Everything ran exactly as promised.</p><div class="author"><div class="avatar">JK</div><div class="info"><div class="name">Janet K</div><div class="role">White Water Rafting</div></div></div></div>
+            <div class="test-card"><div class="quote"><i class="fas fa-quote-left"></i></div><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>Comfortable transport, excellent accommodation, and consistent communication throughout. A truly stress-free holiday.</p><div class="author"><div class="avatar">JK</div><div class="info"><div class="name">Jacob</div><div class="role">Coastal Getaway</div></div></div></div>
+        </div>
+        <div style="text-align:center; margin-top:24px;">
+            <a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" style="background:#E8420A; color:#fff; padding:12px 32px; border-radius:50px; font-weight:600; display:inline-block;">Chat</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- LET'S GO TOGETHER (with Explore All) -->
+<!-- ============================================================ -->
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-header">
+            <div class="left">
+                <span class="sub">Let's Go Together</span>
+                <h2>We Take You Places, You Make the Memories</h2>
+            </div>
+            <div class="right">
+                <a href="contact.html">Explore All <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+        <p style="color:#666; max-width:600px; margin-bottom:30px; line-height:1.6;">Discover a world of unforgettable journeys with Bonfire Adventures, where every trip is crafted to give you exceptional value and truly memorable experiences.</p>
+        <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">
+            <div class="card" style="padding:24px; text-align:center;"><div style="font-size:36px; color:#E8420A; margin-bottom:12px;"><i class="far fa-bookmark"></i></div><h3>Exclusive Deals</h3><p style="font-size:14px; color:#666; line-height:1.6;">Through strong partnerships with leading airlines, hotels, and tour operators, Bonfire unlocks exclusive deals on flights, accommodation, and curated holiday packages across Africa, Europe, Asia, and the Middle East.</p></div>
+            <div class="card" style="padding:24px; text-align:center;"><div style="font-size:36px; color:#E8420A; margin-bottom:12px;"><i class="fas fa-plane-departure"></i></div><h3>Premium Travel</h3><p style="font-size:14px; color:#666; line-height:1.6;">Whether you're dreaming of a romantic honeymoon, a fun group getaway, or a relaxing holiday escape, you'll enjoy premium travel experiences at highly competitive prices.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- HOW BOOKING WORKS -->
+<!-- ============================================================ -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <span class="sub">SIMPLE AND FAST</span>
+            <h2>HOW BOOKING WORKS</h2>
+        </div>
+        <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));">
+            <div class="card" style="padding:24px; text-align:center;"><div style="font-size:28px; font-weight:800; color:#E8420A; margin-bottom:10px;">1</div><h3>Browse Destinations and Packages</h3><p style="font-size:14px; color:#666; line-height:1.5;">Explore our curated deals tailored for your travel style.</p></div>
+            <div class="card" style="padding:24px; text-align:center;"><div style="font-size:28px; font-weight:800; color:#E8420A; margin-bottom:10px;">2</div><h3>Chat with our Advisor</h3><p style="font-size:14px; color:#666; line-height:1.5;">Reach out instantly on WhatsApp. Our team will guide you through options and pricing.</p><a href="#" style="color:#E8420A; font-weight:600; display:inline-block; margin-top:8px;">Let's Go <i class="fas fa-arrow-right"></i></a></div>
+            <div class="card" style="padding:24px; text-align:center;"><div style="font-size:28px; font-weight:800; color:#E8420A; margin-bottom:10px;">3</div><h3>Confirm & Secure Your Spot</h3><p style="font-size:14px; color:#666; line-height:1.5;">Share your details, make a deposit, and look forward to your unforgettable adventure.</p><a href="#" style="color:#E8420A; font-weight:600; display:inline-block; margin-top:8px;">Let's Go <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- POPULAR DESTINATIONS (with Explore All) -->
+<!-- ============================================================ -->
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-header">
+            <div class="left"><span class="sub">BEST PLACE FOR YOU</span><h2>POPULAR DESTINATIONS</h2></div>
+            <div class="right"><a href="packages.html">Explore All <i class="fas fa-arrow-right"></i></a></div>
+        </div>
+        <p style="color:#666; max-width:600px; margin-bottom:30px; line-height:1.6;">Explore the stunning landscapes and diverse wildlife of Kenya, from national reserve safaris to traditional Swahili culture. Immerse yourself in the unique experiences this destination has to offer.</p>
+        <div class="dest-grid">
+            <div class="dest-card"><div class="dest-img"><img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=600&auto=format&fit=crop&q=70" alt="Mauritius"></div><h4>Mauritius</h4><p>Sapphire lagoons, pristine white-sand beaches, and lush rainforests define this idyllic Indian Ocean destination.</p></div>
+            <div class="dest-card"><div class="dest-img"><img src="sa.jpg" alt="South Africa"></div><h4>South Africa</h4><p>Crisp highland air, lush green scenery, and dramatic peaks offer a refreshing and peaceful weekend retreat.</p></div>
+            <div class="dest-card"><div class="dest-img"><img src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&auto=format&fit=crop&q=70" alt="Mount Kenya"></div><h4>Mount Kenya</h4><p>Crisp highland air, lush green scenery, and dramatic peaks offer a refreshing and peaceful weekend retreat.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CTA -->
+<!-- ============================================================ -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Plan Your Next Journey?</h2>
+        <p>Speak directly with our travel advisors and receive clear guidance, transparent pricing, and fast confirmations.</p>
+        <div class="btn-group">
+            <a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" class="btn-primary"><i class="fab fa-whatsapp"></i> Chat with a Travel Expert</a>
+            <a href="packages.html" class="btn-secondary">Browse all Packages <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FOOTER -->
+<!-- ============================================================ -->
+<footer class="footer">
+    <div class="container">
+        <div>
+            <div class="logo"><img src="https://bonfireadventures.com/wp-content/uploads/2026/02/Logo.webp" alt="Bonfire Adventures"></div>
+            <p style="font-size:13px; line-height:1.6; margin:8px 0;">Kenya's trusted tour operator, delivering curated beach holidays, safari experiences, and international travel since 2009.</p>
+            <p style="font-size:13px;"><i class="fas fa-phone-alt" style="color:#E8420A;"></i> +254 750 508 096</p>
+            <p style="font-size:13px;"><i class="fas fa-envelope" style="color:#E8420A;"></i> bonfiretoursadventure@gmail.com</p>
+            <div class="social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-x-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
+        <div><h4>EXPLORE PACKAGES</h4><ul><li><a href="#">Easter Holiday Deals</a></li><li><a href="#">Bush Packages Maasai Mara</a></li><li><a href="#">Coastal Beach Packages</a></li><li><a href="#">Summer Vibes Dubai</a></li><li><a href="#">Naivasha Weekend Getaway</a></li></ul></div>
+        <div><h4>DESTINATIONS</h4><ul><li><a href="#">Diani/UKunda</a></li><li><a href="#">Watamu</a></li><li><a href="#">Samburu</a></li><li><a href="#">Mombasa</a></li><li><a href="#">Maasai Mara</a></li><li><a href="#">Dubai & Abu Dhabi</a></li><li><a href="#">Italy & Vatican</a></li></ul></div>
+        <div><h4>COMPANY</h4><ul><li><a href="#">About Bonfire Adventures</a></li><li><a href="#">Frequently Asked Questions</a></li><li><a href="#">Travel Policies</a></li><li><a href="contact.html">Contact Us</a></li></ul></div>
+        <div class="bottom">
+            <p>© 2026 Bonfire Adventures. All rights reserved.</p>
+            <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:8px; font-size:12px;">
+                <span><i class="fas fa-shield-alt"></i> Secure Booking Process</span>
+                <span><i class="fas fa-check-circle"></i> Transparent Pricing</span>
+                <span><i class="fas fa-handshake"></i> Trusted Travel Advisors</span>
+                <span><i class="fas fa-medal"></i> Established Travel Brand</span>
+            </div>
+            <div style="margin-top:8px; font-size:12px; display:flex; gap:20px; justify-content:center;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms & Conditions</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== WHATSAPP FLOAT ===== -->
+<a href="https://wa.me/254750508096?text=Hi%20Bonfire%20Adventures!%20I%27d%20like%20help%20planning%20my%20holiday%20package." target="_blank" class="whatsapp-float">
+    <i class="fab fa-whatsapp"></i> Chat
+</a>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+    // ── hero search → destinations/packages ──
+    function goToDestination() {
+        const select = document.getElementById('destSearchSelect');
+        const section = select && select.value ? select.value : '';
+        window.location.href = section ? `packages.html#${section}` : 'packages.html';
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('destSearchInput');
+        if (input) {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') goToDestination();
+            });
+        }
+    });
+
+    // ── carousel ──
+    function moveCarousel(id, dir) {
+        const wrap = document.getElementById(id);
+        const track = wrap.querySelector('.carousel-track');
+        const cards = track.querySelectorAll('.card');
+        const visible = window.innerWidth < 600 ? 1 : window.innerWidth < 992 ? 2 : 3;
+        const total = cards.length;
+        let current = parseInt(track.dataset.current || 0);
+        current = Math.max(0, Math.min(current + dir, total - visible));
+        track.dataset.current = current;
+        const gap = 20;
+        const cardWidth = cards[0].offsetWidth + gap;
+        track.style.transform = `translateX(-${current * cardWidth}px)`;
+    }
+
+    // ── tab switching for dest popup ──
+    document.querySelectorAll('.popup .tabs button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const parent = this.closest('.popup');
+            parent.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            parent.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            const target = document.getElementById(this.dataset.tab);
+            if (target) target.classList.add('active');
+        });
+    });
+
+    // ── stats counter ──
+    const stats = document.querySelectorAll('#statsGrid .num');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const target = parseInt(el.dataset.count);
+                let current = 0;
+                const step = Math.ceil(target / 40);
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) { current = target; clearInterval(timer); }
+                    el.innerHTML = current.toLocaleString() + el.innerHTML.replace(/[0-9,]/g, '');
+                }, 30);
+                observer.unobserve(el);
+            }
+        });
+    }, { threshold: 0.3 });
+    stats.forEach(stat => observer.observe(stat));
+
+    // ── tap-to-open dropdowns on mobile (hover doesn't work on touch) ──
+    document.querySelectorAll('.header .nav > li').forEach(li => {
+        const link = li.querySelector('a');
+        const popup = li.querySelector('.popup');
+        if (!link || !popup) return;
+        link.addEventListener('click', function(e) {
+            if (window.innerWidth <= 992) {
+                e.preventDefault();
+                const isOpen = li.classList.contains('popup-open');
+                document.querySelectorAll('.header .nav > li').forEach(other => other.classList.remove('popup-open'));
+                if (!isOpen) li.classList.add('popup-open');
+            }
+        });
+    });
+
+    // ── close mobile menu on outside click ──
+    document.addEventListener('click', function(e) {
+        const nav = document.querySelector('.header .nav');
+        const toggle = document.querySelector('.mobile-toggle');
+        if (nav && toggle && !nav.contains(e.target) && !toggle.contains(e.target)) {
+            nav.classList.remove('active');
+            document.querySelectorAll('.header .nav > li').forEach(li => li.classList.remove('popup-open'));
+        }
+    });
+</script>
+
 </body>
 </html>
